@@ -7,6 +7,9 @@ use think\App;
 use think\exception\ValidateException;
 use think\Validate;
 
+use app\common\cache\ConfigCache;
+use think\facade\View;
+
 /**
  * 控制器基础类
  */
@@ -48,6 +51,11 @@ abstract class BaseController
 
         // 控制器初始化
         $this->initialize();
+        
+        if($this->request->isGet() && !$this->request->isAjax()){
+            View::assign('system_name',ConfigCache::get('sys_config_sysname'));
+        }
+        
     }
 
     // 初始化
@@ -91,4 +99,16 @@ abstract class BaseController
         return $v->failException(true)->check($data);
     }
 
+    
+    /**
+     * 页面渲染方法
+     * @param string $template
+     * @param array $vars
+     * @return string
+     */
+    public function render(string $template = '' ,array $vars = []){
+        $template = $template?:$this->request->action(true);
+        return View::fetch($template,$vars);
+    }
+    
 }
