@@ -4,7 +4,11 @@
  */
 namespace app\admin\controller;
 
-use app\BaseController;
+use think\captcha\facade\Captcha;
+use app\admin\BaseController;
+use app\admin\extend\services\AdminLoginService;
+use app\common\helpers\Result;
+use think\facade\Request;
 
 class PublicController extends BaseController
 {
@@ -13,6 +17,23 @@ class PublicController extends BaseController
      */
     public function loginAction()
     {
-        return $this->render();
+        if(Request::isPost()){
+            $result = (new AdminLoginService())->login();
+            $data = $result->getData();
+            //LoginLog::logAdd($this->request->post('username',''),$data['success']?1:0,$data['msg']);
+            return $result;
+        }else{
+            return $this->render();
+        }
     }
+    
+    /**
+     * 获取验证码
+     * @return \think\Response
+     */
+    public function captchaAction(){
+        return Captcha::create();
+    }
+    
+    
 }
